@@ -62,6 +62,7 @@
             android:textSize="13sp"
             android:fontFamily="monospace"
             android:padding="8dp"
-            android:background="#f5f5f5"/>
+            android:background="@color/result_bg"
+            android:textColor="@color/result_text" />
     </ScrollView>
 </LinearLayout>
