@@ -120,16 +120,10 @@ class MainActivity : AppCompatActivity() {
             val dns = if (customIp.isEmpty()) {
                 Dns.SYSTEM
             } else {
-                Dns { hostname ->
-                    if (hostname == domain) {
-                        try {
-                            listOf(InetAddress.getByName(customIp))
-                        } catch (e: Exception) {
-                            throw UnknownHostException("指定IP无效: $customIp")
-                        }
-                    } else Dns.SYSTEM.lookup(hostname)
-                }
-            }
+                object : Dns {
+                    override fun lookup(hostname: String): List<InetAddress> {
+                        if (hostname == domain) {
+                       ...[truncated]
             val client = OkHttpClient.Builder()
                 .dns(dns)
                 .connectTimeout(15, TimeUnit.SECONDS)

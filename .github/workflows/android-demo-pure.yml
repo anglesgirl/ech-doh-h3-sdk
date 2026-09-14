@@ -43,3 +43,11 @@ jobs:
           name: ech-demo-pure-apk
           path: ech-demo-pure/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      - name: Notify build result
+        if: always()
+        env:
+          BUILD_STATUS: ${{ job.status }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        run: bash .github/scripts/notify-build-result.sh
