@@ -20,8 +20,8 @@ pub mod h3;
 use uniffi::Object;
 
 pub use config::EngineConfig;
-pub use error::{FetchError, Result};
 pub use engine::Engine;
+pub use error::{FetchError, Result};
 
 // Re-export UniFFI types
 pub use crate::engine::HttpMethod;

@@ -93,12 +93,11 @@ impl Engine {
         headers: HashMap<String, String>,
         body: Vec<u8>,
     ) -> Result<crate::HttpResponse> {
-        let url = Url::parse(&url)
-            .map_err(|e| FetchError::InvalidUrl(e.to_string()))?;
+        let url = Url::parse(&url).map_err(|e| FetchError::InvalidUrl(e.to_string()))?;
 
-        let host = url.host_str().ok_or_else(|| {
-            FetchError::InvalidUrl("URL missing host".to_string())
-        })?;
+        let host = url
+            .host_str()
+            .ok_or_else(|| FetchError::InvalidUrl("URL missing host".to_string()))?;
 
         let method_str = match method {
             crate::HttpMethod::GET => "GET",
@@ -162,8 +161,7 @@ impl Engine {
         )?;
 
         // Send request
-        let h3_response = h3_client
-            .send_request(method, url.path(), headers, body)?;
+        let h3_response = h3_client.send_request(method, url.path(), headers, body)?;
 
         // Close connection
         let _ = h3_client.close();
@@ -227,7 +225,7 @@ impl Engine {
             self.config.doh_bootstrap_ip.clone(),
             self.config.connect_timeout_secs,
         )?;
-        
+
         let resolver = Arc::new(resolver);
 
         // Cache it
@@ -237,7 +235,11 @@ impl Engine {
     }
 
     /// Convenience GET method
-    pub fn get(&self, url: String, headers: HashMap<String, String>) -> Result<crate::HttpResponse> {
+    pub fn get(
+        &self,
+        url: String,
+        headers: HashMap<String, String>,
+    ) -> Result<crate::HttpResponse> {
         self.fetch(url, crate::HttpMethod::GET, headers, Vec::new())
     }
 

@@ -6,7 +6,7 @@
 
 use crate::doh::EchConfig;
 use crate::error::{FetchError, Result};
-use rustls::{ClientConfig, RootCertStore, OwnedTrustAnchor};
+use rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore};
 use std::sync::Arc;
 use tracing::{info, warn};
 use webpki_roots::TLS_SERVER_ROOTS;
@@ -91,14 +91,16 @@ impl TlsConfig {
 /// Create a quiche-compatible TLS config for HTTP/3
 /// quiche uses its own BoringSSL internally, ECH is configured via quiche's config
 pub fn create_quiche_tls_config(tls_config: &TlsConfig) -> Result<quiche::Config> {
-    let mut config = quiche::Config::new(quiche::PROTOCOL_VERSION)
-        .map_err(|e| FetchError::TlsHandshakeFailed(format!("Failed to create quiche config: {e}")))?;
+    let mut config = quiche::Config::new(quiche::PROTOCOL_VERSION).map_err(|e| {
+        FetchError::TlsHandshakeFailed(format!("Failed to create quiche config: {e}"))
+    })?;
 
     // quiche with boringssl-vendored handles TLS internally
     // For ECH, quiche will use BoringSSL's ECH support if available
-    
+
     // Set application protocols (HTTP/3)
-    config.set_application_protos(&[b"h3", b"h3-29"])
+    config
+        .set_application_protos(&[b"h3", b"h3-29"])
         .map_err(|e| FetchError::TlsHandshakeFailed(format!("Failed to set ALPN: {e}")))?;
 
     // Set initial congestion window
