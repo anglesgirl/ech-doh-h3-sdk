@@ -55,10 +55,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 sha2 = "0.10"
 
 # Platform-specific
-#[cfg(target_os = "android")]
-android_logger = "0.15"
-
-#[cfg(target_os = "ios")]
+android_logger = { version = "0.15", optional = true }
 oslog = { version = "0.2", optional = true }
 
 # Utilities - minimal, old versions
@@ -75,8 +72,8 @@ uniffi_build = "0.28"
 
 [features]
 default = []
-android = []
-ios = []
+android = ["android_logger"]
+ios = ["oslog"]
 uniffi_cli = ["uniffi/cli"]
 
 [profile.release]
