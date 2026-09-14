@@ -2,23 +2,21 @@
 
 use crate::ech::{create_quiche_tls_config, TlsConfig};
 use crate::error::{FetchError, Result};
-use quiche::h3::{Config as H3Config, Connection as H3Connection, Header, HeaderRef, NameValue};
+use quiche::h3::{Config as H3Config, Connection as H3Connection, Header, NameValue};
 use rand;
 use std::net::UdpSocket;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, ToSocketAddrs};
 use std::time::{Duration, Instant};
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 use url::Url;
 
 /// HTTP/3 client using quiche (blocking/synchronous)
 pub struct H3Client {
-    config: quiche::Config,
     socket: UdpSocket,
     local_addr: SocketAddr,
     peer_addr: SocketAddr,
     connection: quiche::Connection,
     h3_conn: H3Connection,
-    h3_config: H3Config,
     request_timeout: Duration,
 }
 
@@ -90,13 +88,11 @@ impl H3Client {
         })?;
 
         let client = Self {
-            config,
             socket,
             local_addr,
             peer_addr,
             connection: conn,
             h3_conn,
-            h3_config,
             request_timeout: connect_timeout,
         };
 
@@ -274,7 +270,7 @@ impl H3Client {
                                     e
                                 )));
                             }
-                            quiche::h3::Event::PriorityUpdate { .. } => {}
+                            quiche::h3::Event::PriorityUpdate => {}
                             quiche::h3::Event::GoAway => {}
                         }
                     }

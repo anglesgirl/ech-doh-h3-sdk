@@ -4,35 +4,31 @@ use crate::ech::TlsConfig;
 use crate::error::{FetchError, Result};
 use std::sync::Arc;
 use std::time::Duration;
-use tracing::{info, warn};
+use tracing::info;
 
 /// HTTP fallback client using reqwest
 pub struct HttpFallbackClient {
     client: reqwest::blocking::Client,
-    request_timeout: Duration,
 }
 
 impl HttpFallbackClient {
     /// Create a new HTTP fallback client
     pub fn new(
         _tls_config: Arc<TlsConfig>,
-        connect_timeout: Duration,
-        request_timeout: Duration,
+        _connect_timeout: Duration,
+        _request_timeout: Duration,
     ) -> Result<Self> {
         // For reqwest, we don't directly use rustls config
         // reqwest with native-tls handles TLS internally
         let client = reqwest::blocking::Client::builder()
-            .timeout(request_timeout)
-            .connect_timeout(connect_timeout)
+            .timeout(_request_timeout)
+            .connect_timeout(_connect_timeout)
             .build()
             .map_err(|e| FetchError::IoError(format!("Failed to create HTTP client: {e}")))?;
 
         info!("HTTP fallback client created (using reqwest with native-tls)");
 
-        Ok(Self {
-            client,
-            request_timeout,
-        })
+        Ok(Self { client })
     }
 
     /// Perform an HTTP request

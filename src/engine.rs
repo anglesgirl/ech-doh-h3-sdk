@@ -8,8 +8,7 @@ use crate::h2::HttpFallbackClient;
 use crate::h3::H3Client;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 use url::Url;
 
 /// HTTP method enumeration for UniFFI
@@ -185,8 +184,8 @@ impl Engine {
         let doh_resolver = self.get_doh_resolver()?;
 
         // Query ECH config for this domain
-        let host = url.host_str().unwrap();
-        let ech_config = doh_resolver.query_https_record(host)?;
+        let _host = url.host_str().unwrap();
+        let ech_config = doh_resolver.query_https_record(_host)?;
 
         // Create TLS config with ECH
         let tls_config = Arc::new(TlsConfig::new(
@@ -203,7 +202,7 @@ impl Engine {
         )?;
 
         // Send request
-        let http_response = http_client.send_request(method, &url.to_string(), headers, body)?;
+        let http_response = http_client.send_request(method, url.as_ref(), headers, body)?;
 
         Ok(crate::HttpResponse {
             status_code: http_response.status_code,

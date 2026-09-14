@@ -42,20 +42,21 @@ struct DohResponse {
 #[derive(Debug, Deserialize)]
 struct DohAnswer {
     #[serde(rename = "name")]
-    name: String,
+    _name: String,
     #[serde(rename = "type")]
     record_type: u16,
     #[serde(rename = "TTL")]
-    ttl: u32,
+    _ttl: u32,
     #[serde(rename = "data")]
     data: String,
 }
 
 /// DoH resolver with ECHConfig extraction
+#[allow(dead_code)]
 pub struct DohResolver {
     doh_server_url: Url,
-    bootstrap_ip: Option<IpAddr>,
-    timeout: Duration,
+    _bootstrap_ip: Option<IpAddr>,
+    _timeout: Duration,
     client: reqwest::blocking::Client,
 }
 
@@ -82,8 +83,8 @@ impl DohResolver {
 
         Ok(Self {
             doh_server_url,
-            bootstrap_ip,
-            timeout: Duration::from_secs(timeout_secs as u64),
+            _bootstrap_ip: bootstrap_ip,
+            _timeout: Duration::from_secs(timeout_secs as u64),
             client,
         })
     }
@@ -202,7 +203,7 @@ impl DohResolver {
         //   CipherSuite cipher_suites[cipher_suites_len/2];
         // } ECHConfig;
 
-        let cipher_suite = u16::from_be_bytes([config_list[offset], config_list[offset + 1]]);
+        let _cipher_suite = u16::from_be_bytes([config_list[offset], config_list[offset + 1]]);
         offset += 2;
 
         let kem_id = u16::from_be_bytes([config_list[offset], config_list[offset + 1]]);
@@ -227,7 +228,7 @@ impl DohResolver {
         offset += 2;
 
         let mut cipher_suites = Vec::new();
-        for i in 0..cipher_suites_len / 2 {
+        for _i in 0..cipher_suites_len / 2 {
             if offset + 1 < config_list.len() {
                 let cs = u16::from_be_bytes([config_list[offset], config_list[offset + 1]]);
                 cipher_suites.push(cs);

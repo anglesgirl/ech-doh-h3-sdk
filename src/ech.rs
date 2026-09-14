@@ -31,11 +31,12 @@ impl TlsConfig {
 
         if verify_certificates {
             // Add webpki roots (Mozilla's trusted root certificates)
+            #[allow(deprecated)]
             for ta in TLS_SERVER_ROOTS.0.iter() {
                 let anchor = OwnedTrustAnchor::from_subject_spki_name_constraints(
-                    ta.subject.clone(),
-                    ta.spki.clone(),
-                    ta.name_constraints.clone(),
+                    ta.subject,
+                    ta.spki,
+                    ta.name_constraints,
                 );
                 root_store.add_server_trust_anchors(std::iter::once(anchor));
             }
@@ -43,7 +44,7 @@ impl TlsConfig {
             warn!("Certificate verification DISABLED - only for testing!");
         }
 
-        let mut rustls_config = ClientConfig::builder()
+        let rustls_config = ClientConfig::builder()
             .with_safe_defaults()
             .with_root_certificates(root_store)
             .with_no_client_auth();
@@ -90,7 +91,7 @@ impl TlsConfig {
 
 /// Create a quiche-compatible TLS config for HTTP/3
 /// quiche uses its own BoringSSL internally, ECH is configured via quiche's config
-pub fn create_quiche_tls_config(tls_config: &TlsConfig) -> Result<quiche::Config> {
+pub fn create_quiche_tls_config(_tls_config: &TlsConfig) -> Result<quiche::Config> {
     let mut config = quiche::Config::new(quiche::PROTOCOL_VERSION).map_err(|e| {
         FetchError::TlsHandshakeFailed(format!("Failed to create quiche config: {e}"))
     })?;

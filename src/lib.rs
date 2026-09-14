@@ -17,8 +17,6 @@ pub mod error;
 pub mod h2;
 pub mod h3;
 
-use uniffi::Object;
-
 pub use config::EngineConfig;
 pub use engine::Engine;
 pub use error::{FetchError, Result};
