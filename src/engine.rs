@@ -94,7 +94,7 @@ impl Engine {
     ) -> Result<crate::HttpResponse> {
         let url = Url::parse(&url).map_err(|e| FetchError::InvalidUrl(e.to_string()))?;
 
-        let host = url
+        let _host = url
             .host_str()
             .ok_or_else(|| FetchError::InvalidUrl("URL missing host".to_string()))?;
 
@@ -116,7 +116,7 @@ impl Engine {
             match self.fetch_h3(&url, method_str, header_vec.clone(), body.clone()) {
                 Ok(response) => {
                     info!("HTTP/3 request succeeded");
-                    return Ok(response.into());
+                    return Ok(response);
                 }
                 Err(e) => {
                     warn!("HTTP/3 failed, falling back to HTTP: {}", e);
@@ -126,7 +126,7 @@ impl Engine {
 
         // Fallback to HTTP over TLS 1.3
         let response = self.fetch_fallback(&url, method_str, header_vec, body)?;
-        Ok(response.into())
+        Ok(response)
     }
 
     /// Fetch via HTTP/3
