@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ECH + H3 测试"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="域名 (例: cloudflare-ech.com)"
+        android:layout_marginBottom="4dp"/>
+
+    <EditText
+        android:id="@+id/etDomain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="cloudflare-ech.com"
+        android:inputType="textUri"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DoH 服务器 (默认 1.1.1.1)"
+        android:layout_marginBottom="4dp"/>
+
+    <EditText
+        android:id="@+id/etDohServer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="https://1.1.1.1/dns-query"
+        android:inputType="textUri"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="开始测试"
+        android:textSize="18sp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp">
+        <TextView
+            android:id="@+id/tvResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点按钮开始..."
+            android:textSize="13sp"
+            android:fontFamily="monospace"
+            android:padding="8dp"
+            android:background="#f5f5f5"/>
+    </ScrollView>
+</LinearLayout>
