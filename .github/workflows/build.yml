@@ -154,7 +154,7 @@ jobs:
           uses: Swatinem/rust-cache@v2
       
         - name: Install uniffi-bindgen
-          run: cargo install --git https://github.com/mozilla/uniffi-rs --tag uniffi-bindgen-v0.28.0 uniffi_bindgen --locked
+          run: cargo install --git https://github.com/mozilla/uniffi-rs --tag v0.28.0 uniffi_bindgen --locked
       
         - name: Build with uniffi_cli feature
           run: cargo build --features uniffi_cli
