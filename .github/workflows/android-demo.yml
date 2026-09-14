@@ -52,7 +52,7 @@ jobs:
       - name: Generate Kotlin bindings
         id: bindings
         run: |
-          cargo run --features uniffi_cli -- uniffi-bindgen generate src/lib.rs \
+          uniffi-bindgen generate src/lib.rs \
             --language kotlin \
             --out-dir target/bindings/kotlin
           echo "path=target/bindings/kotlin" >> $GITHUB_OUTPUT

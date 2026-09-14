@@ -161,7 +161,7 @@ jobs:
       
         - name: Generate Kotlin bindings
           run: |
-            cargo run --features uniffi_cli -- uniffi-bindgen generate src/lib.rs \
+            uniffi-bindgen generate src/lib.rs \
               --language kotlin \
               --out-dir target/bindings/kotlin
       
