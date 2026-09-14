@@ -38,7 +38,7 @@ jobs:
       - name: Install cargo-ndk & uniffi-bindgen
         run: |
           cargo install cargo-ndk --locked
-          cargo install --git https://github.com/mozilla/uniffi-rs --tag v0.28.0 uniffi-bindgen --locked
+          cargo install --git https://github.com/mozilla/uniffi-rs --tag v0.28.0 uniffi --features bindgen --locked
 
       - name: Build SDK for Android
         run: |
