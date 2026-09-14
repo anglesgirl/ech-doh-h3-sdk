@@ -40,6 +40,20 @@
         android:layout_height="wrap_content"
         android:hint="https://1.1.1.1/dns-query"
         android:inputType="textUri"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="指定 IP（可选，你注入的可用 IP）"
+        android:layout_marginBottom="4dp"/>
+
+    <EditText
+        android:id="@+id/etCustomIp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="例如 44.212.132.255"
+        android:inputType="text"
         android:layout_marginBottom="16dp"/>
 
     <Button

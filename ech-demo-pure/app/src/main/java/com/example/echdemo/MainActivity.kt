@@ -10,9 +10,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Dns
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONObject
 import java.net.HttpURLConnection
+import java.net.InetAddress
 import java.net.URL
+import java.net.UnknownHostException
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         val etDomain = findViewById<EditText>(R.id.etDomain)
         val etDoh = findViewById<EditText>(R.id.etDohServer)
+        val etIp = findViewById<EditText>(R.id.etCustomIp)
         val btnTest = findViewById<Button>(R.id.btnTest)
         val tvResult = findViewById<TextView>(R.id.tvResult)
 
@@ -31,10 +38,11 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val doh = etDoh.text.toString().trim().ifEmpty { "https://1.1.1.1/dns-query" }
-            tvResult.text = "测试中...\n域名: $domain\nDoH: $doh"
+            val ip = etIp.text.toString().trim()
+            tvResult.text = "测试中...\n域名: $domain\nDoH: $doh\n指定IP: ${if (ip.isEmpty()) "(系统解析)" else ip}"
             btnTest.isEnabled = false
             CoroutineScope(Dispatchers.IO).launch {
-                val out = runTest(domain, doh)
+                val out = runTest(domain, doh, ip)
                 withContext(Dispatchers.Main) {
                     tvResult.text = out
                     btnTest.isEnabled = true
@@ -43,44 +51,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun httpGet(urlStr: String, accept: String? = null): Pair<Int, String> {
-        val c = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+    private fun dohGet(dohServer: String, domain: String, qtype: String): JSONObject? {
+        val c = (URL("$dohServer?name=$domain&type=$qtype").openConnection() as HttpURLConnection).apply {
             connectTimeout = 15000
             readTimeout = 15000
             requestMethod = "GET"
+            setRequestProperty("Accept", "application/dns-json")
             setRequestProperty("User-Agent", "EchDemo/1.0")
-            if (accept != null) setRequestProperty("Accept", accept)
         }
         return try {
-            val code = c.responseCode
-            val s = try {
-                c.inputStream.bufferedReader().readText()
-            } catch (e: Exception) {
-                c.errorStream?.bufferedReader()?.readText() ?: ""
-            }
-            // 取关键头
-            val altSvc = c.getHeaderField("alt-svc") ?: ""
-            Pair(code, "$s\n[ALT-SVC:$altSvc]")
+            if (c.responseCode != 200) return null
+            JSONObject(c.inputStream.bufferedReader().readText())
+        } catch (e: Exception) {
+            null
         } finally {
             c.disconnect()
         }
     }
 
-    private fun runTest(domain: String, dohServer: String): String {
+    private fun runTest(domain: String, dohServer: String, customIp: String): String {
         val sb = StringBuilder()
-        sb.append("===== 测试结果 =====\n域名: $domain\nDoH: $dohServer\n\n")
+        sb.append("===== 测试结果 =====\n域名: $domain\nDoH: $dohServer\n指定IP: ${if (customIp.isEmpty()) "(无)" else customIp}\n\n")
 
-        // 1. DoH 查 HTTPS 记录
+        // 1. HTTPS 记录（ECH + H3 广告）
         sb.append("--- DoH HTTPS 记录 ---\n")
         try {
-            val q = "$dohServer?name=$domain&type=HTTPS"
-            val (code, body) = httpGet(q, "application/dns-json")
-            sb.append("DoH状态: $code\n")
-            if (code == 200) {
-                val json = JSONObject(body.substringBefore("[ALT-SVC:"))
+            val json = dohGet(dohServer, domain, "HTTPS")
+            if (json == null) {
+                sb.append("DoH查询失败\n")
+            } else {
                 val answers = json.optJSONArray("Answer")
                 if (answers == null) {
-                    sb.append("无Answer: 可能不支持HTTPS记录\n")
+                    sb.append("公网无HTTPS记录（Status=${json.optInt("Status")}）\n")
+                    sb.append("说明：你本地注入的不影响公网，这项为空正常\n")
                 } else {
                     var hasH3 = false
                     var hasEch = false
@@ -90,27 +93,64 @@ class MainActivity : AppCompatActivity() {
                         if (data.contains("h3")) hasH3 = true
                         if (data.contains("ech=")) hasEch = true
                     }
-                    sb.append("H3: ${if (hasH3) "✅ 广告h3" else "❌ 未见h3"}\n")
-                    sb.append("ECH: ${if (hasEch) "✅ 含ech=" else "❌ 未见ech="}\n")
+                    sb.append("H3广告: ${if (hasH3) "✅" else "❌"}\n")
+                    sb.append("ECH: ${if (hasEch) "✅ 含ech=" else "❌ 无ech="}\n")
                 }
-            } else {
-                sb.append("DoH查询失败\n")
             }
         } catch (e: Exception) {
             sb.append("DoH异常: ${e.message}\n")
         }
 
-        // 2. 直接 HTTPS 抓头看 alt-svc
+        // 2. A 记录供参考
+        sb.append("\n--- DoH A 记录 ---\n")
+        try {
+            val json = dohGet(dohServer, domain, "A")
+            val answers = json?.optJSONArray("Answer")
+            if (answers == null) sb.append("无A记录\n")
+            else for (i in 0 until answers.length()) {
+                sb.append("IP$i: ${answers.getJSONObject(i).optString("data", "")}\n")
+            }
+        } catch (e: Exception) {
+            sb.append("A记录异常: ${e.message}\n")
+        }
+
+        // 3. HTTPS 实测（指定 IP 注入）
         sb.append("\n--- HTTPS 实测 ---\n")
         try {
-            val (code, body) = httpGet("https://$domain")
-            val altSvc = body.substringAfter("[ALT-SVC:", "").substringBefore("]", "")
-            sb.append("状态码: $code\n")
-            sb.append("alt-svc: ${if (altSvc.isEmpty()) "(空)" else altSvc}\n")
-            if (altSvc.contains("h3")) sb.append("H3实测: ✅ 服务端宣告h3\n")
-            else sb.append("H3实测: ⚠️ 未宣告h3\n")
+            val dns = if (customIp.isEmpty()) {
+                Dns.SYSTEM
+            } else {
+                Dns { hostname ->
+                    if (hostname == domain) {
+                        try {
+                            listOf(InetAddress.getByName(customIp))
+                        } catch (e: Exception) {
+                            throw UnknownHostException("指定IP无效: $customIp")
+                        }
+                    } else Dns.SYSTEM.lookup(hostname)
+                }
+            }
+            val client = OkHttpClient.Builder()
+                .dns(dns)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
+                .followRedirects(true)
+                .build()
+            val req = Request.Builder().url("https://$domain/").header("User-Agent", "EchDemo/1.0").build()
+            client.newCall(req).execute().use { resp ->
+                sb.append("状态码: ${resp.code}\n")
+                val altSvc = resp.header("alt-svc") ?: ""
+                sb.append("alt-svc: ${if (altSvc.isEmpty()) "(空)" else altSvc}\n")
+                if (altSvc.contains("h3")) sb.append("H3宣告: ✅ 服务端支持h3（真握手需二期QUIC库）\n")
+                else sb.append("H3宣告: ❌ 未宣告h3\n")
+                // 注意：本演示是 TCP 抓头，不是 QUIC 真连
+                sb.append("注：本次为 TCP 抓头，非 QUIC 真连\n")
+            }
         } catch (e: Exception) {
             sb.append("HTTPS失败: ${e.message}\n")
+            if ((e.message ?: "").contains("reset", true)) {
+                sb.append("提示：被重置多为线路污染，换指定IP重试\n")
+            }
         }
 
         sb.append("\n===== 结束 =====")
