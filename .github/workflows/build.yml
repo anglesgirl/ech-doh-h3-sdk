@@ -140,9 +140,15 @@ jobs:
   generate-bindings:
     name: Generate UniFFI Bindings
     runs-on: ubuntu-latest
-    needs: lint-test
+    needs: [lint-test, build-android]
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Download Android artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-libs
+          path: target/android/jniLibs/
       
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -158,7 +164,7 @@ jobs:
       
       - name: Generate Kotlin bindings
         run: |
-          uniffi-bindgen generate target/aarch64-linux-android/release/libech_doh_h3_sdk.so \
+          uniffi-bindgen generate target/android/jniLibs/arm64-v8a/libech_doh_h3_sdk.so \
             --language kotlin \
             --out-dir target/bindings/kotlin
       
