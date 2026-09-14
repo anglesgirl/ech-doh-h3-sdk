@@ -1,11 +1,6 @@
 name: Build ech-doh-h3-sdk
 
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 env:
