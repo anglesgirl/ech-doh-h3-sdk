@@ -123,7 +123,12 @@ class MainActivity : AppCompatActivity() {
                 object : Dns {
                     override fun lookup(hostname: String): List<InetAddress> {
                         if (hostname == domain) {
-                       ...[truncated]
+                            return listOf(InetAddress.getByName(customIp))
+                        }
+                        return Dns.SYSTEM.lookup(hostname)
+                    }
+                }
+            }
             val client = OkHttpClient.Builder()
                 .dns(dns)
                 .connectTimeout(15, TimeUnit.SECONDS)
