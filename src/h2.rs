@@ -1,4 +1,4 @@
-//! HTTP fallback client using reqwest (simpler than hyper + rustls)
+//! HTTP fallback client using reqwest with rustls
 
 use crate::ech::TlsConfig;
 use crate::error::{FetchError, Result};
@@ -18,15 +18,14 @@ impl HttpFallbackClient {
         _connect_timeout: Duration,
         _request_timeout: Duration,
     ) -> Result<Self> {
-        // For reqwest, we don't directly use rustls config
-        // reqwest with native-tls handles TLS internally
+        // reqwest with rustls-tls handles TLS internally
         let client = reqwest::blocking::Client::builder()
             .timeout(_request_timeout)
             .connect_timeout(_connect_timeout)
             .build()
             .map_err(|e| FetchError::IoError(format!("Failed to create HTTP client: {e}")))?;
 
-        info!("HTTP fallback client created (using reqwest with native-tls)");
+        info!("HTTP fallback client created (using reqwest with rustls-tls)");
 
         Ok(Self { client })
     }

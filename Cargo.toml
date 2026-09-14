@@ -35,7 +35,7 @@ rustls-native-certs = "=0.6"
 webpki-roots = "=0.24"
 
 # Simple HTTP client for DoH
-reqwest = { version = "0.11", features = ["json", "native-tls", "blocking"], default-features = false }
+reqwest = { version = "0.11", features = ["json", "rustls-tls", "blocking"], default-features = false }
 encoding_rs = "=0.8.35"
 rand = "0.8"
 
