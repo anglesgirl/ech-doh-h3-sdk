@@ -49,9 +49,10 @@ jobs:
       - name: Generate Kotlin bindings
         id: bindings
         run: |
-          # Build for host first to get the scaffolding
+          # Build for host with uniffi_cli feature to get metadata
           cargo build --features uniffi_cli --release
-          uniffi-bindgen generate target/release/libech_doh_h3_sdk.so \
+          # Use the Android library for binding generation
+          uniffi-bindgen generate target/aarch64-linux-android/release/libech_doh_h3_sdk.so \
             --language kotlin \
             --out-dir target/bindings/kotlin
           echo "path=target/bindings/kotlin" >> $GITHUB_OUTPUT

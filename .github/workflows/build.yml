@@ -74,7 +74,7 @@ jobs:
       - name: Build for Android
         run: |
           for TARGET in aarch64-linux-android armv7-linux-androideabi x86_64-linux-android; do
-            cargo ndk --target "${TARGET}" -o target/android/jniLibs build --release
+            cargo ndk --target "${TARGET}" -o target/android/jniLibs build --features uniffi_cli --release
           done
       
       - name: Upload Android artifacts
@@ -113,12 +113,12 @@ jobs:
       - name: Build for iOS device
         run: |
           export IPHONEOS_DEPLOYMENT_TARGET=13.0
-          cargo build --target aarch64-apple-ios --release
+          cargo build --target aarch64-apple-ios --features uniffi_cli --release
       
       - name: Build for iOS simulator
         run: |
           export IPHONEOS_DEPLOYMENT_TARGET=13.0
-          cargo build --target x86_64-apple-ios --release
+          cargo build --target x86_64-apple-ios --features uniffi_cli --release
       
       - name: Create XCFramework
         run: |
@@ -158,7 +158,7 @@ jobs:
       
       - name: Generate Kotlin bindings
         run: |
-          uniffi-bindgen generate target/release/libech_doh_h3_sdk.so \
+          uniffi-bindgen generate target/aarch64-linux-android/release/libech_doh_h3_sdk.so \
             --language kotlin \
             --out-dir target/bindings/kotlin
       
