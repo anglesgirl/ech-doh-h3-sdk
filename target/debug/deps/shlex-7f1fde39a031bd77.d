@@ -1,0 +1,8 @@
+/root/ech-doh-h3-sdk/target/debug/deps/libshlex-7f1fde39a031bd77.rmeta: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/bytes.rs
+
+/root/ech-doh-h3-sdk/target/debug/deps/libshlex-7f1fde39a031bd77.rlib: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/bytes.rs
+
+/root/ech-doh-h3-sdk/target/debug/deps/shlex-7f1fde39a031bd77.d: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/bytes.rs
+
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/lib.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-2.0.1/src/bytes.rs:

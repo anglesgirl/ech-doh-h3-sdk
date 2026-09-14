@@ -1,0 +1,12 @@
+/root/ech-doh-h3-sdk/target/release/deps/libuniffi_meta-b1bded942f7dfadd.rmeta: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/ffi_names.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/group.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/reader.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/types.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/metadata.rs
+
+/root/ech-doh-h3-sdk/target/release/deps/libuniffi_meta-b1bded942f7dfadd.rlib: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/ffi_names.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/group.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/reader.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/types.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/metadata.rs
+
+/root/ech-doh-h3-sdk/target/release/deps/uniffi_meta-b1bded942f7dfadd.d: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/ffi_names.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/group.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/reader.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/types.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/metadata.rs
+
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/lib.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/ffi_names.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/group.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/reader.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/types.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uniffi_meta-0.28.3/src/metadata.rs:

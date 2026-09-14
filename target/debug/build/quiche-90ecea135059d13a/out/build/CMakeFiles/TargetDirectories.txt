@@ -1,0 +1,5 @@
+/root/ech-doh-h3-sdk/target/debug/build/quiche-90ecea135059d13a/out/build/CMakeFiles/crypto.dir
+/root/ech-doh-h3-sdk/target/debug/build/quiche-90ecea135059d13a/out/build/CMakeFiles/ssl.dir
+/root/ech-doh-h3-sdk/target/debug/build/quiche-90ecea135059d13a/out/build/CMakeFiles/bssl.dir
+/root/ech-doh-h3-sdk/target/debug/build/quiche-90ecea135059d13a/out/build/CMakeFiles/edit_cache.dir
+/root/ech-doh-h3-sdk/target/debug/build/quiche-90ecea135059d13a/out/build/CMakeFiles/rebuild_cache.dir

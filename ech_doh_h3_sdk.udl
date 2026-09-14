@@ -1,0 +1,68 @@
+namespace ech_doh_h3_sdk;
+
+/// Configuration for the ECH DoH H3 Engine
+record EngineConfig {
+    /// DoH server URL (e.g., "https://1.1.1.1/dns-query" or "https://dns.google/dns-query")
+    string doh_server;
+    /// Optional custom DoH server IP for bootstrapping (bypasses system DNS)
+    string? doh_bootstrap_ip;
+    /// Connection timeout in seconds
+    u32 connect_timeout_secs;
+    /// Request timeout in seconds
+    u32 request_timeout_secs;
+    /// Enable HTTP/3 (QUIC) - if false, uses TCP + TLS 1.3 only
+    boolean enable_h3;
+    /// Enable ECH - if false, uses standard TLS without ECH
+    boolean enable_ech;
+    /// User-Agent string
+    string user_agent;
+    /// Verify TLS certificates (set false only for testing)
+    boolean verify_certificates;
+}
+
+/// Main engine for performing HTTP requests with DoH + ECH + H3
+interface Engine {
+    /// Create a new engine instance with the given configuration
+    constructor(config: EngineConfig);
+
+    /// Perform an HTTP request with binary-safe body handling
+    HttpResponse fetch(
+        string url,
+        HttpMethod method,
+        map<string, string> headers,
+        vector<uint8> body
+    );
+
+    /// Convenience method for GET requests
+    HttpResponse get(string url, map<string, string> headers);
+
+    /// Convenience method for POST requests with binary body
+    HttpResponse post(string url, map<string, string> headers, vector<uint8> body);
+
+    /// Shutdown the engine and cleanup resources
+    void shutdown();
+}
+
+/// Error types
+error FetchError {
+    /// Invalid URL format
+    InvalidUrl(string);
+    /// DNS resolution failed
+    DnsResolutionFailed(string);
+    /// ECH configuration not found or invalid
+    EchConfigNotFound(string);
+    /// TLS handshake failed
+    TlsHandshakeFailed(string);
+    /// QUIC connection failed
+    QuicConnectionFailed(string);
+    /// HTTP request failed
+    HttpRequestFailed(string);
+    /// Timeout
+    Timeout(string);
+    /// IO error
+    IoError(string);
+    /// Engine already shutdown
+    EngineShutdown;
+    /// Invalid configuration
+    InvalidConfig(string);
+}

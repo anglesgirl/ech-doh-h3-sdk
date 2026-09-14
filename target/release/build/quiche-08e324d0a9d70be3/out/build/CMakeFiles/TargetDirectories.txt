@@ -1,0 +1,5 @@
+/root/ech-doh-h3-sdk/target/release/build/quiche-08e324d0a9d70be3/out/build/CMakeFiles/crypto.dir
+/root/ech-doh-h3-sdk/target/release/build/quiche-08e324d0a9d70be3/out/build/CMakeFiles/ssl.dir
+/root/ech-doh-h3-sdk/target/release/build/quiche-08e324d0a9d70be3/out/build/CMakeFiles/bssl.dir
+/root/ech-doh-h3-sdk/target/release/build/quiche-08e324d0a9d70be3/out/build/CMakeFiles/edit_cache.dir
+/root/ech-doh-h3-sdk/target/release/build/quiche-08e324d0a9d70be3/out/build/CMakeFiles/rebuild_cache.dir

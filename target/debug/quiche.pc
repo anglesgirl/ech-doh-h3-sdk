@@ -1,0 +1,11 @@
+# quiche
+
+includedir=/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quiche-0.22.0/include
+libdir=/root/ech-doh-h3-sdk/target/debug
+
+Name: quiche
+Description: quiche library
+URL: https://github.com/cloudflare/quiche
+Version: 0.22.0
+Libs: -Wl,-rpath,${libdir} -L${libdir} -lquiche
+Cflags: -I${includedir}

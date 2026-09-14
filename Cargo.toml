@@ -1,0 +1,91 @@
+[package]
+name = "ech_doh_h3_sdk"
+version = "0.1.0"
+edition = "2021"
+description = "Cross-platform DoH + TLS 1.3 ECH + HTTP/3 native network SDK"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/your-org/ech-doh-h3-sdk"
+
+[lib]
+name = "ech_doh_h3_sdk"
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+# UniFFI for cross-platform bindings
+uniffi = { version = "0.28", features = [] }
+uniffi_macros = "0.28"
+
+# Async runtime - minimal features
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "time", "sync", "fs", "net", "io-util"] }
+
+# QUIC + HTTP/3 - with vendored boringssl
+quiche = { version = "0.22", features = ["boringssl-vendored", "ffi", "pkg-config-meta"] }
+
+# HTTP types - use older versions
+http = "=0.2.9"
+http-body = "=0.4.5"
+http-body-util = "=0.1.1"
+bytes = "=1.4.0"
+hyper = { version = "=0.14", features = ["http2", "client", "runtime", "http1"] }
+hyper-util = { version = "=0.1", features = ["tokio"] }
+tokio-rustls = "=0.23"
+rustls = "=0.20"
+rustls-pemfile = "=1.0"
+rustls-native-certs = "=0.6"
+webpki-roots = "=0.24"
+
+# Simple HTTP client for DoH
+reqwest = { version = "0.11", features = ["json", "native-tls", "blocking"], default-features = false }
+encoding_rs = "=0.8.35"
+rand = "0.8"
+
+# Serialization - minimal
+serde = { version = "1.0", default-features = false }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+# SHA2 for hashing
+sha2 = "0.10"
+
+# Platform-specific
+#[cfg(target_os = "android")]
+android_logger = "0.15"
+
+#[cfg(target_os = "ios")]
+oslog = { version = "0.2", optional = true }
+
+# Utilities - minimal, old versions
+url = "=2.2.2"
+percent-encoding = "2.1"
+base64 = "=0.13"
+hex = "0.4"
+
+# DNS protocol parsing - use trust-dns-proto old version without icu
+# Note: Using manual DoH implementation instead
+
+[build-dependencies]
+uniffi_build = "0.28"
+
+[features]
+default = []
+android = []
+ios = []
+uniffi_cli = ["uniffi/cli"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+opt-level = "z"
+
+[profile.release-lto]
+inherits = "release"
+lto = "fat"
