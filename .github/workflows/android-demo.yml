@@ -40,19 +40,18 @@ jobs:
           cargo install cargo-ndk --locked
           cargo install --git https://github.com/mozilla/uniffi-rs --branch main --features cli uniffi --locked
 
-      - name: Build SDK for Android
+      - name: Build SDK for Android (with uniffi_cli feature)
         run: |
           for TARGET in aarch64-linux-android armv7-linux-androideabi x86_64-linux-android; do
-            cargo ndk --target "${TARGET}" -o target/android/jniLibs build --release
+            cargo ndk --target "${TARGET}" -o target/android/jniLibs build --features uniffi_cli --release
           done
-
-      - name: Build with uniffi_cli feature
-        run: cargo build --features uniffi_cli
 
       - name: Generate Kotlin bindings
         id: bindings
         run: |
-          uniffi-bindgen generate src/lib.rs \
+          # Build for host first to get the scaffolding
+          cargo build --features uniffi_cli --release
+          uniffi-bindgen generate target/release/libech_doh_h3_sdk.so \
             --language kotlin \
             --out-dir target/bindings/kotlin
           echo "path=target/bindings/kotlin" >> $GITHUB_OUTPUT

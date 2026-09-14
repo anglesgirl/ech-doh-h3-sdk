@@ -37,55 +37,52 @@ jobs:
         run: cargo test
 
   # Build for Android
-    build-android:
-      name: Build Android
-      runs-on: ubuntu-latest
-      needs: lint-test
-      steps:
-        - uses: actions/checkout@v4
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - uses: actions/checkout@v4
       
-        - name: Install Rust toolchain
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            targets: aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
       
-        - name: Install Android targets
-          run: rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+      - name: Install Android targets
+        run: rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
       
-        - name: Cache cargo
-          uses: Swatinem/rust-cache@v2
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
       
-        - name: Setup Android NDK
-          uses: nttld/setup-ndk@v1
-          with:
-            ndk-version: r26c
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26c
       
-        - name: Install cargo-ndk
-          run: cargo install cargo-ndk --locked
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk --locked
       
-        - name: Setup OpenSSL for Android cross-compilation
-          run: |
-            # Install OpenSSL for Android cross-compilation
-            sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config
-            # Set up environment for cross-compilation
-            echo "OPENSSL_DIR=/usr/lib/ssl" >> $GITHUB_ENV
-            echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
+      - name: Setup OpenSSL for Android cross-compilation
+        run: |
+          # Install OpenSSL for Android cross-compilation
+          sudo apt-get update && sudo apt-get install -y libssl-dev pkg-config
+          # Set up environment for cross-compilation
+          echo "OPENSSL_DIR=/usr/lib/ssl" >> $GITHUB_ENV
+          echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
       
-        - name: Install cargo-ndk
-          run: cargo install cargo-ndk --locked
+      - name: Build for Android
+        run: |
+          for TARGET in aarch64-linux-android armv7-linux-androideabi x86_64-linux-android; do
+            cargo ndk --target "${TARGET}" -o target/android/jniLibs build --release
+          done
       
-        - name: Build for Android
-          run: |
-            for TARGET in aarch64-linux-android armv7-linux-androideabi x86_64-linux-android; do
-              cargo ndk --target "${TARGET}" -o target/android/jniLibs build --release
-            done
-      
-        - name: Upload Android artifacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: android-libs
-            path: target/android/jniLibs/
-            retention-days: 7
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-libs
+          path: target/android/jniLibs/
+          retention-days: 7
 
   # Build for iOS
   build-ios:
@@ -140,50 +137,50 @@ jobs:
           retention-days: 7
 
   # Generate UniFFI Bindings
-    generate-bindings:
-      name: Generate UniFFI Bindings
-      runs-on: ubuntu-latest
-      needs: lint-test
-      steps:
-        - uses: actions/checkout@v4
+  generate-bindings:
+    name: Generate UniFFI Bindings
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - uses: actions/checkout@v4
       
-        - name: Install Rust toolchain
-          uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
       
-        - name: Cache cargo
-          uses: Swatinem/rust-cache@v2
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
       
-        - name: Install uniffi-bindgen
-          run: cargo install --git https://github.com/mozilla/uniffi-rs --branch main --features cli uniffi --locked
+      - name: Install uniffi-bindgen
+        run: cargo install --git https://github.com/mozilla/uniffi-rs --branch main --features cli uniffi --locked
       
-        - name: Build with uniffi_cli feature
-          run: cargo build --features uniffi_cli
+      - name: Build with uniffi_cli feature
+        run: cargo build --features uniffi_cli --release
       
-        - name: Generate Kotlin bindings
-          run: |
-            uniffi-bindgen generate src/lib.rs \
-              --language kotlin \
-              --out-dir target/bindings/kotlin
+      - name: Generate Kotlin bindings
+        run: |
+          uniffi-bindgen generate target/release/libech_doh_h3_sdk.so \
+            --language kotlin \
+            --out-dir target/bindings/kotlin
       
-        - name: Generate Swift bindings
-          run: |
-            cargo run --features uniffi_cli -- uniffi-bindgen generate src/lib.rs \
-              --language swift \
-              --out-dir target/bindings/swift
+      - name: Generate Swift bindings
+        run: |
+          uniffi-bindgen generate target/release/libech_doh_h3_sdk.dylib \
+            --language swift \
+            --out-dir target/bindings/swift
       
-        - name: Upload Kotlin bindings
-          uses: actions/upload-artifact@v4
-          with:
-            name: kotlin-bindings
-            path: target/bindings/kotlin/
-            retention-days: 7
+      - name: Upload Kotlin bindings
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotlin-bindings
+          path: target/bindings/kotlin/
+          retention-days: 7
       
-        - name: Upload Swift bindings
-          uses: actions/upload-artifact@v4
-          with:
-            name: swift-bindings
-            path: target/bindings/swift/
-            retention-days: 7
+      - name: Upload Swift bindings
+        uses: actions/upload-artifact@v4
+        with:
+          name: swift-bindings
+          path: target/bindings/swift/
+          retention-days: 7
 
   # Release
   release:
