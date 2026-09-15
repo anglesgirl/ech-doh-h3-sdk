@@ -21,6 +21,24 @@ import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
+    // 域名输入清洗：粘 https://xxx/yyy、带端口空格都能用
+    private fun cleanDomain(raw: String): String {
+        var s = raw.trim().lowercase()
+        val scheme = s.indexOf("://")
+        if (scheme >= 0) s = s.substring(scheme + 3)
+        for (stop in listOf('/', '?', '#')) {
+            val i = s.indexOf(stop)
+            if (i >= 0) s = s.substring(0, i)
+        }
+        val colon = s.lastIndexOf(':')
+        if (colon >= 0) {
+            val port = s.substring(colon + 1)
+            if (port.all { it.isDigit() }) s = s.substring(0, colon)
+        }
+        s = s.trim().trim('.').trim()
+        return s
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,14 +50,15 @@ class MainActivity : AppCompatActivity() {
         val tvResult = findViewById<TextView>(R.id.tvResult)
 
         btnTest.setOnClickListener {
-            val domain = etDomain.text.toString().trim()
+            val domain = cleanDomain(etDomain.text.toString())
             if (domain.isEmpty()) {
                 Toast.makeText(this, "请输入域名", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            etDomain.setText(domain)
             val doh = etDoh.text.toString().trim().ifEmpty { "https://1.1.1.1/dns-query" }
             val ip = etIp.text.toString().trim()
-            tvResult.text = "测试中...\n域名: $domain\nDoH: $doh\n指定IP: ${if (ip.isEmpty()) "(系统解析)" else ip}"
+            tvResult.text = "测试中...\n域名: $domain\nDoH: $doh\n指定IP: ${if (ip.isEmpty()) "(按DoH结果)" else ip}"
             btnTest.isEnabled = false
             CoroutineScope(Dispatchers.IO).launch {
                 val out = runTest(domain, doh, ip)
