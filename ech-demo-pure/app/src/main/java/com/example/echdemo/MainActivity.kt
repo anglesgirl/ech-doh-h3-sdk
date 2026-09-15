@@ -47,7 +47,9 @@ class MainActivity : AppCompatActivity() {
         val etDoh = findViewById<EditText>(R.id.etDohServer)
         val etIp = findViewById<EditText>(R.id.etCustomIp)
         val btnTest = findViewById<Button>(R.id.btnTest)
+        val btnEch = findViewById<Button>(R.id.btnEch)
         val tvResult = findViewById<TextView>(R.id.tvResult)
+        com.example.echdemo.ech.BgmEch.ensureInit(this)
 
         btnTest.setOnClickListener {
             val domain = cleanDomain(etDomain.text.toString())
@@ -65,6 +67,25 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     tvResult.text = out
                     btnTest.isEnabled = true
+                }
+            }
+        }
+
+        btnEch.setOnClickListener {
+            val domain = cleanDomain(etDomain.text.toString())
+            if (domain.isEmpty()) {
+                Toast.makeText(this, "请输入域名", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            etDomain.setText(domain)
+            val doh = etDoh.text.toString().trim().ifEmpty { "https://1.1.1.1/dns-query" }
+            tvResult.text = "ECH 测试中...\n域名: $domain\nDoH: $doh"
+            btnEch.isEnabled = false
+            CoroutineScope(Dispatchers.IO).launch {
+                val out = com.example.echdemo.ech.BgmEch.test(domain, doh)
+                withContext(Dispatchers.Main) {
+                    tvResult.text = out
+                    btnEch.isEnabled = true
                 }
             }
         }
