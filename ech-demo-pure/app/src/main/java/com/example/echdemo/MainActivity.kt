@@ -69,6 +69,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 实测的地址来源：指定IP > 你的DoH A记录，绝不走系统解析
+    private inner class DohDns(
+        private val dohServer: String,
+        private val fixedIp: String,
+        private val target: String,
+    ) : Dns {
+        override fun lookup(hostname: String): List<InetAddress> {
+            if (fixedIp.isNotEmpty() && hostname == target) {
+                return listOf(InetAddress.getByName(fixedIp))
+            }
+            val json = dohGet(dohServer, hostname, "A")
+                ?: throw UnknownHostException("DoH无响应: $hostname")
+            val answers = json.optJSONArray("Answer")
+                ?: throw UnknownHostException("DoH无A记录: $hostname")
+            val out = mutableListOf<InetAddress>()
+            for (i in 0 until answers.length()) {
+                val o = answers.getJSONObject(i)
+                if (o.optInt("type", 0) != 1) continue
+                try {
+                    out.add(InetAddress.getByName(o.optString("data", "")))
+                } catch (_: Exception) {
+                }
+            }
+            if (out.isEmpty()) throw UnknownHostException("DoH无有效IP: $hostname")
+            return out
+        }
+    }
+
     private fun runTest(domain: String, dohServer: String, customIp: String): String {
         val sb = StringBuilder()
         sb.append("===== 测试结果 =====\n域名: $domain\nDoH: $dohServer\n指定IP: ${if (customIp.isEmpty()) "(无)" else customIp}\n\n")
@@ -114,21 +142,10 @@ class MainActivity : AppCompatActivity() {
             sb.append("A记录异常: ${e.message}\n")
         }
 
-        // 3. HTTPS 实测（指定 IP 注入）
-        sb.append("\n--- HTTPS 实测 ---\n")
+        // 3. HTTPS 实测（地址只从指定IP/DoH来，不走系统）
+        sb.append("\n--- HTTPS 实测（DNS来源：DoH） ---\n")
         try {
-            val dns = if (customIp.isEmpty()) {
-                Dns.SYSTEM
-            } else {
-                object : Dns {
-                    override fun lookup(hostname: String): List<InetAddress> {
-                        if (hostname == domain) {
-                            return listOf(InetAddress.getByName(customIp))
-                        }
-                        return Dns.SYSTEM.lookup(hostname)
-                    }
-                }
-            }
+            val dns = DohDns(dohServer, customIp, domain)
             val client = OkHttpClient.Builder()
                 .dns(dns)
                 .connectTimeout(15, TimeUnit.SECONDS)
